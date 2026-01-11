@@ -776,3 +776,22 @@ FROM view_users_summary
 WHERE total_posts > 5
 ORDER BY total_posts DESC;
 
+-- Bài 7:
+SELECT u.user_id, u.username, u.gender, u.created_at,
+    (COUNT(DISTINCT p.post_id) + COUNT(DISTINCT c.comment_id)) AS activity_count
+FROM users u
+LEFT JOIN posts p ON u.user_id = p.user_id
+LEFT JOIN comments c ON u.user_id = c.user_id
+GROUP BY u.user_id;
+
+SELECT * FROM view_user_activity_status;
+
+SELECT 'Active' AS status, COUNT(*) AS user_count
+FROM view_user_activity_status
+WHERE activity_count > 0;
+
+SELECT 'Inactive' AS status, COUNT(*) AS user_count
+FROM view_user_activity_status
+WHERE activity_count = 0;
+
+
