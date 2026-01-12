@@ -794,4 +794,41 @@ SELECT 'Inactive' AS status, COUNT(*) AS user_count
 FROM view_user_activity_status
 WHERE activity_count = 0;
 
+-- Bài 8:
+create index idx_hometown on users(hometown);
 
+explain analyze
+
+select u.username, u.full_name, u.hometown, p.post_id, p.content
+from users u
+join posts p on u.user_id = p.user_id
+where u.hometown = 'Hà Nội'
+order by u.username desc
+limit 10;
+
+-- Bìa 9: 
+create view view_users_summary as
+select u.user_id, u.username, count(p.post_id) total_posts
+from users u
+left join posts p on u.user_id = p.user_id
+group by u.user_id, u.username;
+
+select user_id, username, total_posts
+from view_users_summary
+where total_posts > 5;
+
+-- bài 10
+create view view_user_activity_status as
+select u.user_id, u.username, u.gender, u.created_at, p.status_post, c.status_comm from users u
+left join (select distinct user_id, 'active' status_post from posts) p 
+on u.user_id = p.user_id
+left join (select distinct user_id, 'active' status_comm from comments) c 
+on u.user_id = c.user_id;
+
+select * from view_user_activity_status;
+
+select 'active' status, count(distinct u.user_id) user_count from users u
+-- select 'inactive' status, count(u.user_id) user_count
+left join posts p on u.user_id = p.user_id
+left join comments c on u.user_id = c.user_id
+where p.user_id is not null or c.user_id is not null;
